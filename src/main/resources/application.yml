@@ -1,0 +1,24 @@
+server:
+  port: 80
+spring:
+  application:
+    name: Spring_Resume_Project
+  devtools:
+    livereload:
+      enabled: true #화면 갱신
+    restart:
+      enabled: true #재시작
+  thymeleaf:
+    cache: false #캐쉬 없음
+
+  security:
+    user:
+      name: test
+      password: 1234
+
+  #mysql설정
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/spring_b
+    username: root
+    password: 1234
