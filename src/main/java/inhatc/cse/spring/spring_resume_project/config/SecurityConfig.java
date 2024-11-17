@@ -16,12 +16,12 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http)throws Exception{
 
-        http.formLogin(form -> form
+        http.formLogin(form -> form //로그인 정의
                 .loginPage("/member/login")
-                .defaultSuccessUrl("/")
                 .usernameParameter("email")
                 .passwordParameter("password")
-                .failureUrl("/member/login/error")
+                .defaultSuccessUrl("/",true) //로그인 성공시 이동하는 url
+                .failureUrl("/member/login/error") //로그인 실패시 에러 화면 출력
                 .permitAll()
         );
         http.logout(Customizer.withDefaults());
@@ -29,7 +29,7 @@ public class SecurityConfig {
         http.authorizeHttpRequests(request -> request
                 .requestMatchers("/","/member/**").permitAll()
                 .requestMatchers("/css/**").permitAll()
-                .requestMatchers("/admin/**").hasRole("ADMIN")
+                .requestMatchers("/control").hasRole("ADMIN")
                 .anyRequest().authenticated()
         );
 

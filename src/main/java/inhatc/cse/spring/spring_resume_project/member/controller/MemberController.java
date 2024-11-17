@@ -49,25 +49,25 @@ public class MemberController {
         return "redirect:/";
     }
 
-    @GetMapping("/add")
+    @GetMapping("/register")
     public String newMember(Model model){
         model.addAttribute("memberDto", new MemberDto());
-        return "member/add";
+        return "member/register";
     }
 
-    @PostMapping("/add")
+    @PostMapping("/register")
     public String memberNew(@Valid MemberDto memberDto,
                             BindingResult bindingResult,
                             Model model){
         if(bindingResult.hasErrors()){
-            return "member/add";
+            return "member/register";
         }
         try {
             Member member = Member.createMember(memberDto, passwordEncoder);
             memberService.saveMember(member);
         }catch (IllegalStateException e){
             model.addAttribute("errorMessage",e.getMessage());
-            return "member/add";
+            return "member/register";
         }
         return "redirect:/";
     }
