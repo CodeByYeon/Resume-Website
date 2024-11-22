@@ -27,7 +27,6 @@ public class MemberController {
     private final MemberService memberService;
     private final PasswordEncoder passwordEncoder;
 
-
     @GetMapping(value = "/login")
     public String login() {
         return "member/login";

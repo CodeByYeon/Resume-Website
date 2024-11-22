@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layoutpage}"
+>
+<div layout:fragment="content">
+
+    <div id="wrap">
+        <table>
+            <thead>
+            <tr>
+                <th class="one wide">번호</th>
+                <th class="ten wide">이력서 제목</th>
+                <th class="two wide">작성자</th>
+                <th class="three wide">작성일</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            <tr th:each="resumeDto, status: ${resumeList}">
+                <td>
+                    <span th:text="${resume.id}"></span>
+                </td>
+                <td>
+                    <a th:href="@{'/add/' + ${resume.id}}">
+                        <span th:text="${resume.title}"></span>
+                    </a>
+                </td>
+                <td>
+                    <span th:text="${resume.nickname}"></span>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+        <div>
+    <span th:each="pageNum : ${pageList}" th:inline="text">
+        <a th:href="@{'/?page=' + ${pageNum}}">[[${pageNum}]]</a>
+    </span>
+            </br>
+            <form action="/resume/search" method="GET">
+                <div class="search">
+                    <input name="keyword" type="text" placeholder="검색어를 입력해주세요">
+                    <button>검색하기</button>
+                </div>
+            </form>
+            </br>
+            <a th:href="@{/resume/upload}">
+                <button>글쓰기</button>
+            </a>
+        </div>
+    </div>
+</div>
+
+</html>
