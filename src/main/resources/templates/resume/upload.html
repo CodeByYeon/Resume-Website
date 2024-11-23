@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layoutpage}"
+>
+<div layout:fragment="content">
+    <th:block layout:fragment="script">
+
+        <script th:inline="javascript">
+            $(document).ready(function(){
+                var errorMessage = [[${errorMessage}]];
+                if(errorMessage != null){
+                    alert(errorMessage);
+                }
+
+                bindDomEvent();
+
+            });
+
+            function bindDomEvent(){
+                $(".custom-file-input").on("change", function() {
+                    var fileName = $(this).val().split("\\").pop();  // 파일명
+                    var fileExt = fileName.substring(fileName.lastIndexOf(".")+1); // 확장자 추출
+                    fileExt = fileExt.toLowerCase(); //소문자 변환
+
+                    if(fileExt != "pdf"){
+                        alert("PDF 형식 파일만 등록이 가능합니다.");
+                        return;
+                    }
+
+                    $(this).siblings(".custom-file-label").html(fileName);
+                });
+            }
+
+        </script>
+
+    </th:block>
+
+</div>
+
+</html>

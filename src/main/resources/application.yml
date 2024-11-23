@@ -35,6 +35,11 @@ spring:
         format_sql: true
     database-platform: org.hibernate.dialect.MySQL8Dialect
 
+  servlet:
+    multipart:
+      max-file-size: 20MB #파일 1개당 20mb가 최대가 되도록 설정
+      max-request-size: 100MB #총 파일에 100mb까지만 업로드 되도록 설정
+
 
 logging:
   level:
