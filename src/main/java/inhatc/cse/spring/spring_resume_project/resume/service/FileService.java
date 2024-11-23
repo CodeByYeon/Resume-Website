@@ -1,24 +1,17 @@
 package inhatc.cse.spring.spring_resume_project.resume.service;
 
-import inhatc.cse.spring.spring_resume_project.resume.dto.ResumeDto;
-import inhatc.cse.spring.spring_resume_project.resume.repository.ResumeRepository;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.UUID;
 
 @Service
-@Transactional
 @Slf4j
-@RequiredArgsConstructor
-public class ResumeService {
-    private final ResumeRepository resumeRepository;
-
-    public void uploadResume(String uploadPath,String originalFileName,
+public class FileService {
+    public String uploadResume(String uploadPath,String originalFileName,
                              byte[] fileData) throws IOException {
         UUID uuid = UUID.randomUUID(); //파일명을 랜덤하게 바꿔주는 것
         String ext =originalFileName.substring(originalFileName.lastIndexOf("."),originalFileName.length());
@@ -28,6 +21,17 @@ public class ResumeService {
         FileOutputStream fos = new FileOutputStream(fileUploadFullPath);
         fos.write(fileData);
         fos.close();
-    }
 
+        return savedFileName;
+
+    }
+    public void deleteFile(String filePath){
+        File deleteFile = new File(filePath);
+        if(deleteFile.exists()){
+            deleteFile.delete();
+            log.info("파일을 삭제했습니다.");
+        }else {
+            log.info(filePath + "파일이 존재하지 않습니다.");
+        }
+    }
 }
