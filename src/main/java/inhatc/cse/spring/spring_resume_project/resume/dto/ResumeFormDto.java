@@ -22,7 +22,7 @@ public class ResumeFormDto {
     private String title;
 
     @NotBlank(message = "내용은 필수 입력 사항입니다.")
-    private String contets;
+    private String contents;
 
     private List<ResumeFileDto> resumeFileDtoList = new ArrayList<>();  //이력서 파일 리스트
 

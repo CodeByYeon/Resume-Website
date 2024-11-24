@@ -4,6 +4,7 @@ import inhatc.cse.spring.spring_resume_project.resume.dto.ResumeFormDto;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 
 @Controller
 public class ResumeController {

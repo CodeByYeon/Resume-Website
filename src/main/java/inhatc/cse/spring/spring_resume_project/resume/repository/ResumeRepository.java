@@ -12,15 +12,15 @@ import java.util.List;
 @Repository
 public interface ResumeRepository extends JpaRepository<Resume, Long>, QuerydslPredicateExecutor<Resume> {
 
-    List<Resume> findByResumeTitle(String title);
-    List<Resume> findByResumeTitleLike(String title);
+    List<Resume> findByTitle(String title);
+    List<Resume> findByTitleLike(String title);
     List<Resume> findByNickname(String nickname);
 
     @Query("select i from Resume i where i.contents like %:contents%")
-    List<Resume> findResumeContents(@Param("contents") String contents);
+    List<Resume> findContents(@Param("contents") String contents);
 
     @Query(value = "select * from Resume i where i.contents like %:contents%",nativeQuery = true)
-    List<Resume> findResumeContentsNative(@Param("contents") String contents);
+    List<Resume> findContentsNative(@Param("contents") String contents);
 
 
 

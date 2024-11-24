@@ -2,55 +2,76 @@
 <html lang="en"
       xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layouts/layoutpage}"
->
+      layout:decorate="~{layouts/layoutpage}">
+<head>
+    <style>
+        table {
+            width: 80%;
+            border-collapse: collapse;
+            margin: 0 auto;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        tbody tr:hover {
+            background-color: #f9f9f9;
+        }
+        .actions {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .actions button {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
 <div layout:fragment="content">
-
     <div id="wrap">
         <table>
             <thead>
             <tr>
-                <th class="one wide">번호</th>
-                <th class="ten wide">이력서 제목</th>
-                <th class="two wide">작성자</th>
-                <th class="three wide">작성일</th>
+                <th style="width: 10%;">번호</th>
+                <th style="width: 50%;">이력서 제목</th>
+                <th style="width: 20%;">작성자</th>
+                <th style="width: 20%;">작성일</th>
             </tr>
             </thead>
-
             <tbody>
-            <tr th:each="resumeDto, status: ${resumeList}">
-                <td>
-                    <span th:text="${resume.id}"></span>
-                </td>
+            <tr th:each="resume : ${resumeList}">
+                <td><span th:text="${resume.id}"></span></td>
                 <td>
                     <a th:href="@{'/add/' + ${resume.id}}">
                         <span th:text="${resume.title}"></span>
                     </a>
                 </td>
-                <td>
-                    <span th:text="${resume.nickname}"></span>
-                </td>
+                <td><span th:text="${resume.nickname}"></span></td>
+                <td><span th:text="${resume.createdAt}"></span></td>
             </tr>
             </tbody>
         </table>
-
-        <div>
-    <span th:each="pageNum : ${pageList}" th:inline="text">
-        <a th:href="@{'/?page=' + ${pageNum}}">[[${pageNum}]]</a>
-    </span>
-            </br>
+        <div class="actions">
+            <span th:each="pageNum : ${pageList}" th:inline="text">
+                <a th:href="@{'/?page=' + ${pageNum}}">[[${pageNum}]]</a>
+            </span>
+            <br><br>
             <form action="/resume/search" method="GET">
                 <div class="search">
-                    <input name="keyword" type="text" placeholder="검색어를 입력해주세요">
-                    <button>검색하기</button>
+                    <input type="text" class="form-control" placeholder="상품명을 입력해주세요">
+                    <button class="btn btn-primary">검색하기</button>
                 </div>
             </form>
-            </br>
+            <br>
             <a th:href="@{/resume/upload}">
-                <button>글쓰기</button>
+                <button class="btn btn-primary">글쓰기</button>
             </a>
         </div>
     </div>
 </div>
-
+</body>
 </html>
