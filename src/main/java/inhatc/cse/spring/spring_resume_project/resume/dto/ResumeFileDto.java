@@ -15,7 +15,6 @@ public class ResumeFileDto {
 
     private Long id;
 
-
     private String fileName;    //저장된 파일 이름
 
     private String oriFileName; //원본 파일 이름
