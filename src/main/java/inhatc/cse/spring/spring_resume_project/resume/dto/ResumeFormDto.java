@@ -34,7 +34,7 @@ public class ResumeFormDto {
         return modelMapper.map(this,Resume.class);
     }
 
-    public ResumeFormDto of(Resume resume){
+    public static ResumeFormDto of(Resume resume){
         return modelMapper.map(this,ResumeFormDto.class);
     }
 

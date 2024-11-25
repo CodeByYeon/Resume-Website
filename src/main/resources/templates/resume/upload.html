@@ -69,7 +69,7 @@
         <textarea class="form-control" aria-label="With textarea" th:field="*{contents}" placeholder="내용을 입력해주세요"></textarea>
     </div>
     <p th:if="${#fields.hasErrors('contents')}" th:errors="*{contents}" class="fieldError">내용은 필수 입력값입니다.</p>
-    <div th:if="${#lists.isEmpty(resumeFormDto.resumeFileDtoList)}"><!--상품 리스트가 비어있는 경우-->
+    <div th:if="${#lists.isEmpty(resumeFormDto.resumeFileDtoList)}"><!--파일 리스트가 비어있는 경우-->
         <div class="form-group" th:each="num: ${#numbers.sequence(1,5)}">
             <div class="custom-file">
                 <input type="file" class="custom-file-input" name="resumeFile">
