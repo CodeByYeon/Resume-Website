@@ -46,12 +46,11 @@
             <tr th:each="resume : ${resumeList}">
                 <td><span th:text="${resume.id}"></span></td>
                 <td>
-                    <a th:href="@{'/add/' + ${resume.id}}">
-                        <span th:text="${resume.title}"></span>
+                    <a th:href="@{/resume/view/{id}(id=${resume.id})}" th:text="${resume.title}"></a>
                     </a>
                 </td>
-                <td><span th:text="${resume.nickname}"></span></td>
-                <td><span th:text="${resume.createdAt}"></span></td>
+                <td th:text="${resume.nickname}"></td>
+                <td th:text="${#dates.format(resume.modifiedDate, 'yyyy-MM-dd')}"></td>
             </tr>
             </tbody>
         </table>

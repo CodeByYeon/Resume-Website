@@ -23,9 +23,6 @@ public class Member extends BaseEntity {
     @Column(unique = true, length = 30) //유니크 키, 30자가 최대치임
     private String nickname;
 
-    @Column(nullable = false, length = 30) //널 가능한지, 30자가 최대치임
-    private String name;
-
     @Column(nullable = false,length = 200) //암호화 걸리면 엄청 길어지기 때문에 200자
     private String password;
 
@@ -39,7 +36,6 @@ public class Member extends BaseEntity {
 
         Member member = Member.builder()
                 .nickname(memberDto.getNickname())
-                .name(memberDto.getName())
                 .email(memberDto.getEmail())
                 .password(passwordEncoder.encode(memberDto.getPassword()))
                 .role(Role.USER) //기본 유저의 권한을 유저로 설정한다

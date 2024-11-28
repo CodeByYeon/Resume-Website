@@ -1,8 +1,8 @@
 server:
   port: 80
 
-resumeFileLocation: C:/resumeProject/resumeFile
-uploadPath: file///C:/resumeProject
+resumeFileLocation: C:/resumeProject/resumeFile/
+uploadPath: file///C:/resumeProject/
 spring:
   application:
     name: Spring_Resume_Project

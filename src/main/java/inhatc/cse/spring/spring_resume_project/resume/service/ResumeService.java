@@ -1,5 +1,7 @@
 package inhatc.cse.spring.spring_resume_project.resume.service;
 
+import inhatc.cse.spring.spring_resume_project.member.entity.Member;
+import inhatc.cse.spring.spring_resume_project.member.repository.MemberRepository;
 import inhatc.cse.spring.spring_resume_project.resume.dto.ResumeFileDto;
 import inhatc.cse.spring.spring_resume_project.resume.dto.ResumeFormDto;
 import inhatc.cse.spring.spring_resume_project.resume.entity.Resume;
@@ -8,12 +10,14 @@ import inhatc.cse.spring.spring_resume_project.resume.repository.ResumeFileRepos
 import inhatc.cse.spring.spring_resume_project.resume.repository.ResumeRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -23,9 +27,18 @@ public class ResumeService {
     private final ResumeRepository resumeRepository;
     private final ResumeFileService resumeFileService;
     private final ResumeFileRepository resumeFileRepository;
+    private final MemberRepository memberRepository;
 
-    public Long saveResume(ResumeFormDto resumeFormDto, List<MultipartFile> resumeFileList) throws Exception{
-        Resume resume = resumeFormDto.createResume();
+
+    public Member findMemberByEmail(String email){
+        return memberRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
+    }
+
+    public Long saveResume(ResumeFormDto resumeFormDto,
+                           List<MultipartFile> resumeFileList,
+                           Member member) throws Exception{
+        Resume resume = resumeFormDto.createResume(member);
         resumeRepository.save(resume);
 
         for (int i = 0; i < resumeFileList.size(); i++) {
@@ -50,4 +63,6 @@ public class ResumeService {
         resumeFormDto.setResumeFileDtoList(resumeFileDtoList);
         return resumeFormDto;
     }
+
+
 }

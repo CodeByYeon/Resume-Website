@@ -1,11 +1,14 @@
 package inhatc.cse.spring.spring_resume_project.resume.controller;
 
+import inhatc.cse.spring.spring_resume_project.member.entity.Member;
 import inhatc.cse.spring.spring_resume_project.resume.dto.ResumeFormDto;
 import inhatc.cse.spring.spring_resume_project.resume.service.ResumeFileService;
 import inhatc.cse.spring.spring_resume_project.resume.service.ResumeService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -29,31 +32,36 @@ public class ResumeController {
     }
 
     @GetMapping("/resume/list")
-    public String resumeList(){
+    public String resumeList(Model model){
         return "resume/list";
     }
 
     @GetMapping("/resume/upload")
-    public String resumeUpload(Model model){
+    public String resumeUploadForm(Model model){
         model.addAttribute("resumeFormDto",new ResumeFormDto());
         return "resume/upload";
     }
 
     @PostMapping("/resume/upload")
-    public String resumeUpload(@Valid ResumeFormDto resumeFormDto, BindingResult bindingResult, Model model, @RequestParam("resumeFile")List<MultipartFile> resumeFileList){
+    public String resumeUpload(@Valid ResumeFormDto resumeFormDto,
+                               BindingResult bindingResult, Model model,
+                               @RequestParam("resumeFile")List<MultipartFile> resumeFileList,
+                               @AuthenticationPrincipal UserDetails userDetails){
         if(bindingResult.hasErrors()){
             return "resume/upload";
         }
         if(resumeFileList.get(0).isEmpty() && resumeFormDto.getId() == null){
             model.addAttribute("errorMessage","첫번째 파일은 필수로 첨부해야 합니다.");
+            return "resume/upload";
         }
         try{
-            resumeService.saveResume(resumeFormDto, resumeFileList);
+            Member member = resumeService.findMemberByEmail(userDetails.getUsername());
+            resumeService.saveResume(resumeFormDto, resumeFileList, member);
         }catch (Exception e){
             model.addAttribute("errorMessage","이력서 등록 중 에러가 발생하였습니다.");
             return "resume/upload";
         }
-        return "redirect:/";
+        return "redirect:/resume/list";
     }
 
     @GetMapping("/resume/{resumeId}")
@@ -68,6 +76,7 @@ public class ResumeController {
         }
         return "resume/upload";
     }
+
 
 
 }
