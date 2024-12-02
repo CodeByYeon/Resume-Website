@@ -83,4 +83,25 @@ public class ResumeService {
         return resumeRepository.getResumePage(resumeSearchDto,pageable);
     }
 
+    public boolean canEditOrDelete(Resume resume, Member currentMember) {
+        return resume.getMember().getId().equals(currentMember.getId())
+                || currentMember.getRole().toString().equals("ADMIN");
+    }
+
+
+    public Resume getResumeById(Long resumeId) {
+        return resumeRepository.findById(resumeId)
+                .orElseThrow(() -> new EntityNotFoundException("해당 이력서를 찾을 수 없습니다."));
+    }
+
+    public void deleteResume(Long resumeId) {
+        Resume resume = getResumeById(resumeId);
+        resumeRepository.delete(resume);
+    }
+
+    public ResumeFile getResumeFile(Long fileId) {
+        return resumeFileRepository.findById(fileId)
+                .orElseThrow(() -> new EntityNotFoundException("해당 파일이 존재하지 않습니다."));
+    }
+
 }

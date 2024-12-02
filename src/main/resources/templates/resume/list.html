@@ -38,7 +38,7 @@
 
 <div layout:fragment="content">
 
-    <form th:action="@{'/resume/view/' + ${resumes.number}}" role="form" method="get" th:object="${resumes}">
+    <form th:action="@{'/resume/list/' + ${resumes.number}}" role="form" method="get" th:object="${resumes}">
         <table class="table">
             <thead>
             <tr>
@@ -63,17 +63,17 @@
         <div th:with="start=${(resumes.number/maxPage)*maxPage + 1}, end=(${(resumes.totalPages == 0) ? 1 : (start + (maxPage - 1) < resumes.totalPages ? start + (maxPage - 1) : resumes.totalPages)})" >
             <ul class="pagination justify-content-center">
 
-                <li class="page-resume" th:classappend="${resumes.first}?'disabled'">
+                <li class="page-item" th:classappend="${resumes.first}?'disabled'">
                     <a th:onclick="'javascript:page(' + ${resumes.number - 1} + ')'" aria-label='Previous' class="page-link">
                         <span aria-hidden='true'>이전 페이지</span>
                     </a>
                 </li>
 
-                <li class="page-resume" th:each="page: ${#numbers.sequence(start, end)}" th:classappend="${resumes.number eq page-1}?'active':''">
+                <li class="page-item" th:each="page: ${#numbers.sequence(start, end)}" th:classappend="${resumes.number eq page-1}?'active':''">
                     <a th:onclick="'javascript:page(' + ${page - 1} + ')'" th:inline="text" class="page-link">[[${page}]]</a>
                 </li>
 
-                <li class="page-resume" th:classappend="${resumes.last}?'disabled'">
+                <li class="page-item" th:classappend="${resumes.last}?'disabled'">
                     <a th:onclick="'javascript:page(' + ${resumes.number + 1} + ')'" aria-label='Next' class="page-link">
                         <span aria-hidden='true'>다음 페이지</span>
                     </a>
@@ -89,13 +89,21 @@
                 <option value="1w">1주</option>
                 <option value="1m">1개월</option>
                 <option value="6m">6개월</option>
+            </select>
             <select th:field="*{searchBy}" class="form-control" style="width:auto;">
-                <option value="itemNm">이력서 제목</option>
-                <option value="createdBy">닉네임</option>
+                <option value="title">이력서 제목</option>
+                <option value="nickname">닉네임</option>
             </select>
             <input th:field="*{searchQuery}" type="text" class="form-control" placeholder="검색어를 입력해주세요">
             <button id="searchBtn" type="submit" class="btn btn-primary">검색</button>
         </div>
+        </br>
+        <div class="form-inline justify-content-center">
+            <a th:href="'/resume/upload'">
+                <button id="createBtn" type="button" class="btn btn-primary">새 이력서 등록</button>
+            </a>
+        </div>
+
     </form>
 
 </div>

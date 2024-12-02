@@ -4,25 +4,37 @@ import inhatc.cse.spring.spring_resume_project.member.entity.Member;
 import inhatc.cse.spring.spring_resume_project.resume.dto.ResumeFormDto;
 import inhatc.cse.spring.spring_resume_project.resume.dto.ResumeSearchDto;
 import inhatc.cse.spring.spring_resume_project.resume.entity.Resume;
+import inhatc.cse.spring.spring_resume_project.resume.entity.ResumeFile;
 import inhatc.cse.spring.spring_resume_project.resume.service.ResumeFileService;
 import inhatc.cse.spring.spring_resume_project.resume.service.ResumeService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
 
@@ -78,14 +90,22 @@ public class ResumeController {
     }
 
     @GetMapping("/resume/modify/{resumeId}")
-    public String resumeDtl(@PathVariable("resumeId") Long resumeId, Model model){ //이력서 수정 페이지로 진입하는 함수
-        try{
-            ResumeFormDto resumeFormDto = resumeService.getResumeDtl(resumeId); //조회한 이력서 데이터를 모델에 담아서 뷰로 전달.
-            model.addAttribute("resumeFormDto",resumeFormDto);
-        }catch (EntityNotFoundException e){ // 이력서 엔티티가 존재하지 않을 경우 에러메시지를 담아서 이력서 리스트 페이지로 이동
-            model.addAttribute("errorMessage", "존재하지 않는 글 입니다.");
-            model.addAttribute("resumeFormDto",new ResumeFormDto());
-            return "resume/list";
+    public String resumeDtl(@PathVariable("resumeId") Long resumeId, Model model,
+                            @AuthenticationPrincipal UserDetails userDetails){ //이력서 수정 페이지로 진입하는 함수
+        Resume resume = resumeService.getResumeById(resumeId);
+        Member currentMember =resumeService.findMemberByEmail(userDetails.getUsername());
+        if(!resumeService.canEditOrDelete(resume,currentMember)){
+            model.addAttribute("errorMessage", "본인이 작성한 글만 수정하거나 삭제할 수 있습니다.");
+            return "redirect:/resume/list";
+        }else {
+            try {
+                ResumeFormDto resumeFormDto = resumeService.getResumeDtl(resumeId); //조회한 이력서 데이터를 모델에 담아서 뷰로 전달.
+                model.addAttribute("resumeFormDto", resumeFormDto);
+            } catch (EntityNotFoundException e) { // 이력서 엔티티가 존재하지 않을 경우 에러메시지를 담아서 이력서 리스트 페이지로 이동
+                model.addAttribute("errorMessage", "존재하지 않는 글 입니다.");
+                model.addAttribute("resumeFormDto", new ResumeFormDto());
+                return "resume/list";
+            }
         }
         return "resume/upload";
     }
@@ -106,7 +126,97 @@ public class ResumeController {
             model.addAttribute("errorMessage","게시글 수정 중 오류가 발생했습니다.");
             return "resume/upload";
         }
-        return "redirect:/";
+        return "redirect:/resume/list";
     }
+
+    @PostMapping("/resume/delete/{resumeId}")
+    public String deleteResume(@PathVariable("resumeId") Long resumeId,
+                               @AuthenticationPrincipal UserDetails userDetails,
+                               Model model) {
+        try {
+            Resume resume = resumeService.getResumeById(resumeId);
+            Member currentMember = resumeService.findMemberByEmail(userDetails.getUsername());
+
+            // 권한 확인
+            if (!resumeService.canEditOrDelete(resume, currentMember)) {
+                model.addAttribute("errorMessage", "본인이 작성한 글만 삭제할 수 있습니다.");
+                return "redirect:/resume/list";
+            }
+
+            // 삭제 처리
+            resumeService.deleteResume(resumeId);
+        } catch (Exception e) {
+            model.addAttribute("errorMessage", "삭제 중 오류가 발생했습니다.");
+            return "redirect:/resume/list";
+        }
+        return "redirect:/resume/list";
+    }
+
+    @DeleteMapping("/resume/delete/{resumeId}")
+    public String delete(@PathVariable("resumeId") Long resumeId,
+                               @AuthenticationPrincipal UserDetails userDetails,
+                               Model model) {
+        try {
+            Resume resume = resumeService.getResumeById(resumeId);
+            Member currentMember = resumeService.findMemberByEmail(userDetails.getUsername());
+
+            if (!resumeService.canEditOrDelete(resume, currentMember)) {
+                model.addAttribute("errorMessage", "본인이 작성한 글만 삭제할 수 있습니다.");
+                return "redirect:/resume/list";
+            }
+
+            resumeService.deleteResume(resumeId);
+        } catch (Exception e) {
+            model.addAttribute("errorMessage", "삭제 중 오류가 발생했습니다.");
+            return "redirect:/resume/list";
+        }
+        return "redirect:/resume/list";
+    }
+
+
+    @GetMapping("/resume/view/{resumeId}") //세부 내용 조회 메소드
+    public String viewResume(@PathVariable("resumeId") Long resumeId,
+                             @AuthenticationPrincipal UserDetails userDetails,
+                             Model model) {
+        try {
+            Resume resume = resumeService.getResumeById(resumeId);
+            Member currentMember = resumeService.findMemberByEmail(userDetails.getUsername());
+
+            // 수정/삭제 권한 확인
+            boolean canEdit = resumeService.canEditOrDelete(resume, currentMember);
+            model.addAttribute("resume", resume);
+            model.addAttribute("canEdit", canEdit);
+        } catch (EntityNotFoundException e) {
+            model.addAttribute("errorMessage", "존재하지 않는 글입니다.");
+            return "redirect:/resume/list";
+        }
+        return "resume/view";
+    }
+    @GetMapping("/resume/download/{fileId}")
+    public ResponseEntity<Resource> downloadFile(@PathVariable("fileId") Long fileId) throws IOException {
+        ResumeFile resumeFile = resumeService.getResumeFile(fileId); // 파일 정보 조회
+        Path filePath = Paths.get(resumeFile.getFileUrl()); // 저장된 파일 경로 가져오기
+
+        if (!Files.exists(filePath)) {
+            throw new FileNotFoundException("파일이 존재하지 않습니다: " + filePath.toString());
+        }
+
+        // 파일을 Resource로 변환
+        Resource resource = new UrlResource(filePath.toUri());
+        if (!resource.exists() || !resource.isReadable()) {
+            throw new IOException("파일을 읽을 수 없습니다.");
+        }
+
+        // 파일 이름 설정
+        String encodedFileName = URLEncoder.encode(resumeFile.getOriFileName(), StandardCharsets.UTF_8);
+
+        // 헤더 작성 (파일 다운로드)
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + encodedFileName + "\"")
+                .body(resource);
+    }
+
+
 
 }

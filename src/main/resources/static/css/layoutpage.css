@@ -9,6 +9,16 @@ body {
 .content{
     margin-bottom:100px;
     margin-top: 50px;
-    margin-left: 200px;
-    margin-right: 200px;
+    margin-left: 100px;
+    margin-right: 100px;
+}
+.form-inline {
+    display: flex;
+    justify-content: center; /* 수평 가운데 정렬 */
+    align-items: center;    /* 수직 가운데 정렬 (필요시) */
+    vertical-align: middle;
+    gap: 5px;       /* 요소 간 간격 */
+}
+#searchBtn {
+    flex: 0 0 auto;  /* 버튼은 고정 크기 */
 }
