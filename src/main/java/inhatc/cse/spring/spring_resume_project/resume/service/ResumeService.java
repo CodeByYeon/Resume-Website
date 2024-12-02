@@ -99,9 +99,9 @@ public class ResumeService {
         resumeRepository.delete(resume);
     }
 
-    public ResumeFile getResumeFile(Long fileId) {
+    public ResumeFile getResumeFileById(Long fileId) {
         return resumeFileRepository.findById(fileId)
-                .orElseThrow(() -> new EntityNotFoundException("해당 파일이 존재하지 않습니다."));
+                .orElseThrow(() -> new IllegalArgumentException("해당 파일이 존재하지 않습니다."));
     }
 
 }

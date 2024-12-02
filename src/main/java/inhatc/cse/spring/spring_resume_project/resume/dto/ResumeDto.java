@@ -23,7 +23,4 @@ public class ResumeDto {
 
     private String contents;
 
-
-
-
 }

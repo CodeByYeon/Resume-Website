@@ -31,7 +31,7 @@ public class ResumeFileService {
         if(!StringUtils.isEmpty(oriFileName)){ //파일 첨부 공간이 비어 있지 않은 경우라면
             fileName = fileService.uploadResumeFile(resumeFileLocation,oriFileName,resumeFileName.getBytes()); //파일 이름을 저장하고
 
-            fileUrl = "/files/resume/" + fileName; //파일경로를 저장한다.
+            fileUrl = "/resumeProject/resumeFile/" + fileName; //파일경로를 저장한다.
         }
         resumeFile.updateResumeFile(oriFileName,fileName,fileUrl); //파일 공간 비어있건 안비어있건 정보를 담고
         resumeFileRepository.save(resumeFile); //저장한다

@@ -10,6 +10,7 @@ import inhatc.cse.spring.spring_resume_project.resume.service.ResumeService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Page;
@@ -43,6 +44,10 @@ import java.util.Optional;
 public class ResumeController {
 
     private final ResumeService resumeService;
+
+    @Value("${resumeFileLocation}")
+    private String resumeFileLocation;
+
 
     @GetMapping("/")
     public String home(){
@@ -192,31 +197,35 @@ public class ResumeController {
         }
         return "resume/view";
     }
-    @GetMapping("/resume/download/{fileId}")
-    public ResponseEntity<Resource> downloadFile(@PathVariable("fileId") Long fileId) throws IOException {
-        ResumeFile resumeFile = resumeService.getResumeFile(fileId); // 파일 정보 조회
-        Path filePath = Paths.get(resumeFile.getFileUrl()); // 저장된 파일 경로 가져오기
-
-        if (!Files.exists(filePath)) {
-            throw new FileNotFoundException("파일이 존재하지 않습니다: " + filePath.toString());
+    @GetMapping("/resume/download/{id}")
+    public ResponseEntity<Resource> downloadFile(@PathVariable Long id) {
+        // 이력서 파일 조회
+        ResumeFile resumeFile = resumeService.getResumeFileById(id);
+        if (resumeFile == null || resumeFile.getFileUrl() == null) {
+            throw new IllegalArgumentException("파일이 존재하지 않습니다.");
         }
 
-        // 파일을 Resource로 변환
-        Resource resource = new UrlResource(filePath.toUri());
-        if (!resource.exists() || !resource.isReadable()) {
-            throw new IOException("파일을 읽을 수 없습니다.");
+        try {
+            // 파일 경로 조합
+            Path filePath = Paths.get(resumeFileLocation).resolve(resumeFile.getFileUrl()).normalize();
+            Resource resource = new UrlResource(filePath.toUri());
+
+            if (!resource.exists() || !resource.isReadable()) {
+                throw new FileNotFoundException("파일이 존재하지 않거나 읽을 수 없습니다: " + filePath.toString());
+            }
+
+            // 파일 이름 가져오기
+            String fileName = filePath.getFileName().toString();
+
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileName + "\"")
+                    .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                    .body(resource);
+
+        } catch (Exception e) {
+            throw new RuntimeException("파일 다운로드 중 문제가 발생했습니다.", e);
         }
-
-        // 파일 이름 설정
-        String encodedFileName = URLEncoder.encode(resumeFile.getOriFileName(), StandardCharsets.UTF_8);
-
-        // 헤더 작성 (파일 다운로드)
-        return ResponseEntity.ok()
-                .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + encodedFileName + "\"")
-                .body(resource);
     }
-
 
 
 }
