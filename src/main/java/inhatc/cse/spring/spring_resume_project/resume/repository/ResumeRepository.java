@@ -10,11 +10,11 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface ResumeRepository extends JpaRepository<Resume, Long>, QuerydslPredicateExecutor<Resume> {
+public interface ResumeRepository extends JpaRepository<Resume, Long>, QuerydslPredicateExecutor<Resume>, ResumeRepositoryCustom {
 
     List<Resume> findByTitle(String title);
     List<Resume> findByTitleLike(String title);
-    List<Resume> findByNickname(String nickname);
+    List<Resume> findByMemberId(Long memberId);
 
     @Query("select i from Resume i where i.contents like %:contents%")
     List<Resume> findContents(@Param("contents") String contents);

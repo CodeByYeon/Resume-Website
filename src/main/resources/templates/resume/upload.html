@@ -55,7 +55,7 @@
         이력서 등록
     </p>
     <input type="hidden" th:field="*{id}">
-    <input type="hidden" th:field="*{nickname}">
+    <input type="hidden" th:field="*{memberId}">
     <div class="input-group">
         <div class="input-group-prepend">
             <span class="input-group-text">제목</span>
@@ -78,11 +78,20 @@
             </div>
         </div>
     </div>
+    <div th:if = "${not #lists.isEmpty(resumeFormDto.resumeFileDtoList)}">
+        <div class="form-group" th:each="resumeFileDto, status: ${resumeFormDto.resumeFileDtoList}">
+            <div class="custom-file">
+                <input type="file" class="custom-file-input" name="resumeFile">
+                <input type="hidden" name="resumeFileIds" th:value="${resumeFileDto.id}">
+                <label class="custom-file-label" th:text="${not #strings.isEmpty(resumeFileDto.oriFileName)} ? ${resumeFileDto.oriFileName} : '첨부된 파일' + ${status.index+1}"></label>
+            </div>
+        </div>
+    </div>
     <div th:if="${#strings.isEmpty(resumeFormDto.id)}" style="text-align: center">
         <button th:formaction="@{/resume/upload}" type="submit" class="btn btn-primary">저장</button>
     </div>
     <div th:unless="${#strings.isEmpty(resumeFormDto.id)}" style="text-align: center">
-        <button th:formaction="@{'/resume/' + ${itemFormDto.id} }" type="submit" class="btn btn-primary">수정</button>
+        <button th:formaction="@{'/resume/modify/' + ${resumeFormDto.id} }" type="submit" class="btn btn-primary">수정</button>
     </div>
     <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
 </div>

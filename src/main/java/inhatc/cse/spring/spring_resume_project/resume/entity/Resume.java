@@ -2,6 +2,7 @@ package inhatc.cse.spring.spring_resume_project.resume.entity;
 
 import inhatc.cse.spring.spring_resume_project.common.entity.BaseEntity;
 import inhatc.cse.spring.spring_resume_project.member.entity.Member;
+import inhatc.cse.spring.spring_resume_project.resume.dto.ResumeFormDto;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -34,5 +35,10 @@ public class Resume extends BaseEntity {
     @OneToMany(fetch = FetchType.LAZY,mappedBy = "resume",
             cascade = CascadeType.ALL, orphanRemoval = true) // 파일을 여러개 올릴 수 있으니 연결해주고, 게시글 삭제되면 파일도 삭제되도록 설정함
     private List<ResumeFile> resumeFileList = new ArrayList<>();
+
+    public void updateResume(ResumeFormDto resumeFormDto){
+        this.title = resumeFormDto.getTitle();
+        this.contents = resumeFormDto.getContents();
+    }
 
 }

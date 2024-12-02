@@ -27,6 +27,8 @@ public class ResumeFormDto {
 
     private Long memberId; // 작성자의 Member ID 추가
 
+    private String nickName;
+
     private List<ResumeFileDto> resumeFileDtoList = new ArrayList<>();  //이력서 파일 리스트
 
     private List<Long> resumeFileIds = new ArrayList<>();               //이력서들의 ID를 저장
@@ -36,6 +38,7 @@ public class ResumeFormDto {
     public Resume createResume(Member member){
         Resume resume = modelMapper.map(this,Resume.class);
         resume.setMember(member);
+        resume.setNickname(member.getNickname());
         return resume;
     }
 

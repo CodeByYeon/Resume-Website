@@ -24,7 +24,6 @@ public class MemberTest {
         MemberDto memberDto = MemberDto.builder()
                 .nickname("군산 피바다")
                 .email("test@test.com")
-                .name("홍길동1")
                 .password("1111")
                 .build();
         System.out.println(memberDto);

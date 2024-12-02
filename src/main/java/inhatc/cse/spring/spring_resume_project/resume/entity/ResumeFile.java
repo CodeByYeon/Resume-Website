@@ -27,6 +27,7 @@ public class ResumeFile extends BaseEntity {
 
     private String fileUrl;     //파일 저장 경로
 
+
     public void updateResumeFile(String oriFileName, String fileName, String fileUrl){
         this.oriFileName = oriFileName;
         this.fileName = fileName;

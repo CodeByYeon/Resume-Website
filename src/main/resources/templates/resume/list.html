@@ -3,74 +3,101 @@
       xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layouts/layoutpage}">
-<head>
+<!-- 사용자 스크립트 추가 -->
+<th:block layout:fragment="script">
+    <script th:inline="javascript">
+
+        $(document).ready(function(){
+            $("#searchBtn").on("click",function(e) {
+                e.preventDefault();
+                page(0);
+            });
+        });
+
+        function page(page){
+            var searchDateType = $("#searchDateType").val();
+            var searchBy = $("#searchBy").val();
+            var searchQuery = $("#searchQuery").val();
+
+            location.href="/resume/list/" + page + "?searchDateType=" + searchDateType
+                + "&searchBy=" + searchBy
+                + "&searchQuery=" + searchQuery;
+        }
+
+    </script>
+</th:block>
+
+<!-- 사용자 CSS 추가 -->
+<th:block layout:fragment="css">
     <style>
-        table {
-            width: 80%;
-            border-collapse: collapse;
-            margin: 0 auto;
-        }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: center;
-        }
-        th {
-            background-color: #f2f2f2;
-        }
-        tbody tr:hover {
-            background-color: #f9f9f9;
-        }
-        .actions {
-            text-align: center;
-            margin-top: 20px;
-        }
-        .actions button {
-            margin-top: 10px;
+        select{
+            margin-right:10px;
         }
     </style>
-</head>
-<body>
+</th:block>
+
 <div layout:fragment="content">
-    <div id="wrap">
-        <table>
+
+    <form th:action="@{'/resume/view/' + ${resumes.number}}" role="form" method="get" th:object="${resumes}">
+        <table class="table">
             <thead>
             <tr>
-                <th style="width: 10%;">번호</th>
-                <th style="width: 50%;">이력서 제목</th>
-                <th style="width: 20%;">작성자</th>
-                <th style="width: 20%;">작성일</th>
+                <td>번호</td>
+                <td>이력서 제목</td>
+                <td>등록자</td>
+                <td>등록일</td>
             </tr>
             </thead>
             <tbody>
-            <tr th:each="resume : ${resumeList}">
-                <td><span th:text="${resume.id}"></span></td>
+            <tr th:each="resume, status: ${resumes.getContent()}">
+                <td th:text="${resume.id}"></td>
                 <td>
-                    <a th:href="@{/resume/view/{id}(id=${resume.id})}" th:text="${resume.title}"></a>
-                    </a>
+                    <a th:href="'/resume/view/'+${resume.id}" th:text="${resume.title}"></a>
                 </td>
                 <td th:text="${resume.nickname}"></td>
-                <td th:text="${#dates.format(resume.modifiedDate, 'yyyy-MM-dd')}"></td>
+                <td th:text="${resume.regeTime}"></td>
             </tr>
             </tbody>
         </table>
-        <div class="actions">
-            <span th:each="pageNum : ${pageList}" th:inline="text">
-                <a th:href="@{'/?page=' + ${pageNum}}">[[${pageNum}]]</a>
-            </span>
-            <br><br>
-            <form action="/resume/search" method="GET">
-                <div class="search">
-                    <input type="text" class="form-control" placeholder="상품명을 입력해주세요">
-                    <button class="btn btn-primary">검색하기</button>
-                </div>
-            </form>
-            <br>
-            <a th:href="@{/resume/upload}">
-                <button class="btn btn-primary">글쓰기</button>
-            </a>
+
+        <div th:with="start=${(resumes.number/maxPage)*maxPage + 1}, end=(${(resumes.totalPages == 0) ? 1 : (start + (maxPage - 1) < resumes.totalPages ? start + (maxPage - 1) : resumes.totalPages)})" >
+            <ul class="pagination justify-content-center">
+
+                <li class="page-resume" th:classappend="${resumes.first}?'disabled'">
+                    <a th:onclick="'javascript:page(' + ${resumes.number - 1} + ')'" aria-label='Previous' class="page-link">
+                        <span aria-hidden='true'>이전 페이지</span>
+                    </a>
+                </li>
+
+                <li class="page-resume" th:each="page: ${#numbers.sequence(start, end)}" th:classappend="${resumes.number eq page-1}?'active':''">
+                    <a th:onclick="'javascript:page(' + ${page - 1} + ')'" th:inline="text" class="page-link">[[${page}]]</a>
+                </li>
+
+                <li class="page-resume" th:classappend="${resumes.last}?'disabled'">
+                    <a th:onclick="'javascript:page(' + ${resumes.number + 1} + ')'" aria-label='Next' class="page-link">
+                        <span aria-hidden='true'>다음 페이지</span>
+                    </a>
+                </li>
+
+            </ul>
         </div>
-    </div>
+
+        <div class="form-inline justify-content-center" th:object="${resumeSearchDto}">
+            <select th:field="*{searchDateType}" class="form-control" style="width:auto;">
+                <option value="all">전체기간</option>
+                <option value="1d">1일</option>
+                <option value="1w">1주</option>
+                <option value="1m">1개월</option>
+                <option value="6m">6개월</option>
+            <select th:field="*{searchBy}" class="form-control" style="width:auto;">
+                <option value="itemNm">이력서 제목</option>
+                <option value="createdBy">닉네임</option>
+            </select>
+            <input th:field="*{searchQuery}" type="text" class="form-control" placeholder="검색어를 입력해주세요">
+            <button id="searchBtn" type="submit" class="btn btn-primary">검색</button>
+        </div>
+    </form>
+
 </div>
-</body>
+
 </html>

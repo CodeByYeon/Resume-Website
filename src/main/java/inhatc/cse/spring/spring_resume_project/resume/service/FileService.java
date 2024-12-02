@@ -11,7 +11,7 @@ import java.util.UUID;
 @Service
 @Slf4j
 public class FileService {
-    public String uploadResume(String uploadPath,String originalFileName,
+    public String uploadResumeFile(String uploadPath,String originalFileName,
                              byte[] fileData) throws IOException {
         UUID uuid = UUID.randomUUID(); //파일명을 랜덤하게 바꿔주는 것
         String ext =originalFileName.substring(originalFileName.lastIndexOf("."),originalFileName.length());
