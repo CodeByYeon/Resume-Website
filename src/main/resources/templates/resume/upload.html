@@ -60,7 +60,7 @@
         <div class="input-group-prepend">
             <span class="input-group-text">제목</span>
         </div>
-        <input type="text" th:field="*{title}" class="form-control" placeholder="상품명을 입력해주세요">
+        <input type="text" th:field="*{title}" class="form-control" placeholder="제목을 입력해주세요">
         <p th:if="${#fields.hasErrors('title')}" th:errors="*{title}" class="fieldError">제목은 필수 입력값입니다.</p>
     </div>
     <div class="input-group">
